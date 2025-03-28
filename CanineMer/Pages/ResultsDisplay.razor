@@ -7,14 +7,25 @@
             <span class="label">Resting Energy Requirement (RER):</span>
             <span class="value">@Model.Rer.ToString("N2") kcal</span>
         </div>
-        <div class="result-item">
-            <span class="label">MER Lower Bounds:</span>
-            <span class="value">@Model.LowerBounds.ToString("N2") kcal</span>
-        </div>
-        <div class="result-item">
-            <span class="label">MER Upper Bounds:</span>
-            <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
-        </div>
+        @if(Model.UpperBounds != Model.LowerBounds)
+        {
+            <div>Maintenance Energy Requirement (MER)</div>
+            <div class="result-item">
+                <span class="label ps-3">Lower Bounds:</span>
+                <span class="value">@Model.LowerBounds.ToString("N2") kcal</span>
+            </div>
+            <div class="result-item">
+                <span class="label ps-3">Upper Bounds:</span>
+                <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+            </div>
+        }
+        else
+        {
+            <div class="result-item">
+                <span class="label">Maintenance Energy Requirement (MER):</span>
+                <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+            </div>
+        }
     </div>
 }
 
