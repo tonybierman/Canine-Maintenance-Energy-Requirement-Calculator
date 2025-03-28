@@ -2,7 +2,6 @@
 {
     public class MerCalculatorResultsVM
     {
-        public long? SubjectId { get; set; }
         public string? LifeStage { get; set; }
         public double WeightInPounds { get; set; }
         public double LowerBounds { get; set; }
@@ -12,21 +11,36 @@
 
         public static MerCalculatorResultsVM Calculate(LifeStageFactorsEnum lifeStage, double weightInKgs)
         {
-            (double lowerMer, double upperMer) result = 
-                CanineMerCalculator.CalculateMer(lifeStage, weightInKgs);
+            if (weightInKgs <= 0)
+                throw new ArgumentOutOfRangeException(nameof(weightInKgs), "Weight must be positive.");
 
-            double rer = CanineMerCalculator.CalculateRer(weightInKgs);
+            try
+            {
+                var (rer, lowerMer, upperMer) = CanineMerCalculator.CalculateMer(lifeStage, weightInKgs);
+                double mean = (lowerMer + upperMer) / 2;
 
-            var retval = new MerCalculatorResultsVM();
-            retval.LifeStage = lifeStage.ToString().AddSpacesToPascalCase();
-            retval.WeightInPounds = CanineMerCalculator.KgToLbs(weightInKgs);
-            retval.LowerBounds = result.lowerMer;
-            retval.UpperBounds = result.upperMer;
-            retval.Rer = rer;
-            retval.Mean = CanineMerCalculator.CalculateMeanMer(lifeStage,
-                weightInKgs);
-
-            return retval;
+                return new MerCalculatorResultsVM
+                {
+                    LifeStage = lifeStage.ToString().AddSpacesToPascalCase(),
+                    WeightInPounds = CanineMerCalculator.KgToLbs(weightInKgs),
+                    LowerBounds = lowerMer,
+                    UpperBounds = upperMer,
+                    Rer = rer,
+                    Mean = mean
+                };
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                throw new ArgumentOutOfRangeException(nameof(weightInKgs), ex, "Invalid weight provided for calculation.");
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ArgumentException($"Invalid life stage: {lifeStage}", nameof(lifeStage), ex);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Failed to calculate MER results.", ex);
+            }
         }
     }
 }

@@ -1,12 +1,5 @@
 ﻿namespace CanineMer
 {
-    public enum MealPlanTierEnum
-    {
-        Essential = 1,
-        Balanced = 2,
-        Performance = 3
-    }
-
     public enum LifeStageFactorsEnum
     {
         None = 0,
@@ -22,74 +15,69 @@
         Lactation = 10
     }
 
-    // https://todaysveterinarynurse.com/nutrition/veterinary-nutrition-math/
     public class CanineMerCalculator
     {
         private const double PoundsPerKilogram = 2.20462;
 
-        // Convert kilograms to pounds
         public static double KgToLbs(double kilograms)
         {
+            if (kilograms < 0)
+                throw new ArgumentOutOfRangeException(nameof(kilograms), "Weight cannot be negative.");
             return kilograms * PoundsPerKilogram;
         }
 
-        // Convert pounds to kilograms
         public static double LbsToKg(double pounds)
         {
+            if (pounds < 0)
+                throw new ArgumentOutOfRangeException(nameof(pounds), "Weight cannot be negative.");
             return pounds / PoundsPerKilogram;
         }
 
-        // Calculate RER based on the dog's weight
         public static double CalculateRer(double bodyWeightKg)
         {
-            return 70 * Math.Sqrt(Math.Sqrt(bodyWeightKg * bodyWeightKg * bodyWeightKg));
+            if (bodyWeightKg <= 0)
+                throw new ArgumentOutOfRangeException(nameof(bodyWeightKg), "Body weight must be positive.");
+            return 70 * Math.Pow(bodyWeightKg, 0.75); // Simplified from nested Sqrt
         }
 
-        // Calculate MER based on life stage
-        public static (double lowerMer, double upperMer) CalculateMer(LifeStageFactorsEnum lifeStage, double bodyWeightKg)
+        public static (double rer, double lowerMer, double upperMer) CalculateMer(LifeStageFactorsEnum lifeStage, double bodyWeightKg)
         {
             double rer = CalculateRer(bodyWeightKg);
-
-            // Get MER range factors based on life stage
             (double lowerFactor, double upperFactor) = GetMerRange(lifeStage);
-
-            // Calculate and return MER range
-            return (rer * lowerFactor, rer * upperFactor);
+            return (rer, rer * lowerFactor, rer * upperFactor);
         }
 
-        // Adjusting MER based on life stage using LifeStageFactorsEnum
         public static (double lowerFactor, double upperFactor) GetMerRange(LifeStageFactorsEnum lifeStage)
         {
             switch (lifeStage)
             {
-                case LifeStageFactorsEnum.NeuteredAdult:
-                case LifeStageFactorsEnum.IntactAdult:
+                case LifeStageFactorsEnum.NeuteredAdult: // 1.4–1.6: Typical for neutered adults
+                case LifeStageFactorsEnum.IntactAdult:   // 1.4–1.6: Slightly low for intact, but combined for simplicity
                     return (1.4, 1.6);
-                case LifeStageFactorsEnum.InactiveObeseProne:
+                case LifeStageFactorsEnum.InactiveObeseProne: // 1.2–1.4: Reduced for obesity management
                     return (1.2, 1.4);
-                case LifeStageFactorsEnum.WeightLoss:
+                case LifeStageFactorsEnum.WeightLoss: // 1.0: Restricted for weight loss
                     return (1.0, 1.0);
-                case LifeStageFactorsEnum.WeightGain:
+                case LifeStageFactorsEnum.WeightGain: // 1.2–1.8: Increased for growth
                     return (1.2, 1.8);
-                case LifeStageFactorsEnum.ActiveWorkingDog:
+                case LifeStageFactorsEnum.ActiveWorkingDog: // 2.0–5.0: Wide range for high activity
                     return (2.0, 5.0);
-                case LifeStageFactorsEnum.Puppy0To4Months:
+                case LifeStageFactorsEnum.Puppy0To4Months: // 3.0: High for early growth
                     return (3.0, 3.0);
-                case LifeStageFactorsEnum.Puppy4MonthsToAdult:
+                case LifeStageFactorsEnum.Puppy4MonthsToAdult: // 1.5–2.0: Transition to adult needs
                     return (1.5, 2.0);
-                case LifeStageFactorsEnum.Gestation:
+                case LifeStageFactorsEnum.Gestation: // 1.6–2.0: Increased for pregnancy
                     return (1.6, 2.0);
-                case LifeStageFactorsEnum.Lactation:
+                case LifeStageFactorsEnum.Lactation: // 2.0–5.0: High for milk production
                     return (2.0, 5.0);
                 default:
-                    throw new ArgumentException("Invalid life stage provided.");
+                    throw new ArgumentException($"Invalid life stage: {lifeStage}", nameof(lifeStage));
             }
         }
 
-        // New function to calculate the mean of the MER range
         public static double CalculateMeanMer(LifeStageFactorsEnum lifeStage, double bodyWeightKg)
         {
-            (double lowerMer, double upperMer) = CalculateMer(lifeStage, bodyWeightKg);
+            (double rer, double lowerMer, double upperMer) = CalculateMer(lifeStage, bodyWeightKg);
             return (lowerMer + upperMer) / 2;
         }
     }

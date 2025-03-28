@@ -1,0 +1,105 @@
+﻿@using System.Linq
+
+<p>Input a dog's weight and lifestyle to see his or her maintenance energy requirement.</p>
+
+<p>
+    <label>
+        Dog's Weight in Pounds:
+        <input type="number" min="1" @bind="InputValue" @bind:event="oninput" />
+    </label>
+</p>
+
+@if (InputValue > 0)
+{
+    <p>
+        <label>
+            Dog's life stage:
+            <select @bind="SelectedType">
+                <option value="0">Select a value</option>
+                @foreach (var factor in lifeStages)
+                {
+                    <option value="@((int)factor)">@factor.ToString().AddSpacesToPascalCase()</option>
+                }
+            </select>
+        </label>
+    </p>
+}
+
+<p class="bg-light px-3">
+    <ResultsDisplay Model="ResultsVM" />
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <span class="text-danger">@errorMessage</span>
+    }
+</p>
+
+@code {
+    private int inputValue = 45; // Default set to 45 lbs.
+    private MerCalculatorResultsVM? ResultsVM { get; set; }
+    private string? errorMessage;
+    private int _selectedType = 2; // Default set to 2 (Adult)
+
+    private int SelectedType
+    {
+        get => _selectedType;
+        set
+        {
+            _selectedType = value;
+            UpdateResults();
+        }
+    }
+
+    private int InputValue
+    {
+        get => inputValue;
+        set
+        {
+            inputValue = value < 1 ? 1 : value; // Prevent values less than 1
+            UpdateResults();
+        }
+    }
+
+    private readonly IEnumerable<LifeStageFactorsEnum> lifeStages = Enum.GetValues(typeof(LifeStageFactorsEnum))
+        .Cast<LifeStageFactorsEnum>()
+        .Where(f => f != LifeStageFactorsEnum.None)
+        .OrderBy(f => f.ToString())
+        .ToList();
+
+    protected override void OnInitialized()
+    {
+        UpdateResults(); // Calculate and display results on initial render
+    }
+
+    private void UpdateResults()
+    {
+        try
+        {
+            if (_selectedType > 0 && inputValue > 0)
+            {
+                ResultsVM = MerCalculatorResultsVM.Calculate((LifeStageFactorsEnum)_selectedType, CanineMerCalculator.LbsToKg(inputValue));
+                errorMessage = null; // Clear any previous error
+            }
+            else
+            {
+                ResultsVM = null;
+                errorMessage = "Please select a valid life stage and enter a positive weight.";
+            }
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            ResultsVM = null;
+            errorMessage = $"Invalid weight: {ex.Message}";
+        }
+        catch (ArgumentException ex)
+        {
+            ResultsVM = null;
+            errorMessage = $"Invalid life stage: {ex.Message}";
+        }
+        catch (Exception ex)
+        {
+            ResultsVM = null;
+            errorMessage = "An unexpected error occurred while calculating the results. Please try again.";
+            // Optional logging: Console.WriteLine($"Unexpected error: {ex.Message}");
+        }
+    }
+}
