@@ -1,0 +1,85 @@
+﻿@page "/"
+@using System.Linq
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div>
+    <label>
+        Input Value:
+        <input type="number" @bind="InputValue" @bind:event="oninput" />
+    </label>
+</div>
+
+<p>
+    <code>inputValue</code>: @InputValue
+</p>
+
+@if (InputValue > 0)
+{
+    <div>
+        <label>
+            Select your dog's life stage:
+            <select @bind="SelectedType">
+                <option value="0">Select a value</option>
+                @foreach (var factor in Enum.GetValues(typeof(LifeStageFactorsEnum))
+                    .Cast<LifeStageFactorsEnum>()
+                    .Where(f => f != LifeStageFactorsEnum.None)
+                    .OrderBy(f => f.ToString()))
+                {
+                    <option value="@((int)factor)">@factor.ToString().AddSpacesToPascalCase()</option>
+                }
+            </select>
+        </label>
+    </div>
+}
+
+<ResultsDisplay Model="ResultsVM" />
+
+@code {
+    private int inputValue;
+    private MerCalculatorResultsVM? ResultsVM { get; set; }
+
+    private int _selectedType;
+    private int SelectedType
+    {
+        get => _selectedType;
+        set
+        {
+            _selectedType = value;
+            UpdateResults();
+        }
+    }
+
+    private int InputValue
+    {
+        get => inputValue;
+        set
+        {
+            inputValue = value;
+            UpdateResults();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        ResultsVM = null;
+    }
+
+    private void UpdateResults()
+    {
+        if (_selectedType > 0 && inputValue > 0)
+        {
+            ResultsVM = MerCalculatorResultsVM.Calculate((LifeStageFactorsEnum)_selectedType, inputValue);
+        }
+        else
+        {
+            ResultsVM = null;
+        }
+        StateHasChanged();
+    }
+}
+

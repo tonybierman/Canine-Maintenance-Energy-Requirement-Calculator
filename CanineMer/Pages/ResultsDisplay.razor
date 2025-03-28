@@ -1,0 +1,24 @@
+﻿@* ResultsDisplay.razor *@
+@if (Model != null)
+{
+    <div class="results-container">
+        <h3>Calculation Results</h3>
+        <div class="result-item">
+            <span class="label">Resting Energy Requirement (RER):</span>
+            <span class="value">@Model.Rer.ToString("N2") kcal</span>
+        </div>
+        <div class="result-item">
+            <span class="label">Lower Bounds:</span>
+            <span class="value">@Model.LowerBounds.ToString("N2") kcal</span>
+        </div>
+        <div class="result-item">
+            <span class="label">Upper Bounds:</span>
+            <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public MerCalculatorResultsVM? Model { get; set; }
+}
