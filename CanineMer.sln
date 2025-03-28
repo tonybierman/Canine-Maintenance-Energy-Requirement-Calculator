@@ -5,6 +5,8 @@ VisualStudioVersion = 17.13.35913.81 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CanineMer", "CanineMer\CanineMer.csproj", "{92868FAA-05A4-4CB2-AD78-CB77D29ABD5F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CanineMer.Tests", "CanineMer.Tests\CanineMer.Tests.csproj", "{DDA30F87-516C-4015-9698-A596BE44849C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{92868FAA-05A4-4CB2-AD78-CB77D29ABD5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92868FAA-05A4-4CB2-AD78-CB77D29ABD5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92868FAA-05A4-4CB2-AD78-CB77D29ABD5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDA30F87-516C-4015-9698-A596BE44849C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDA30F87-516C-4015-9698-A596BE44849C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDA30F87-516C-4015-9698-A596BE44849C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDA30F87-516C-4015-9698-A596BE44849C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
