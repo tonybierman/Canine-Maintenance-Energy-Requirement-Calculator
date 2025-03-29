@@ -38,6 +38,10 @@
         /// </summary>
         public double Rer { get; internal set; }
 
+        public double? CupsLow { get; set; }    // Nullable to indicate optional
+        public double? CupsHigh { get; set; }   // Nullable to indicate optional
+        public double? CupsMean { get; set; }   // Nullable to indicate optional
+
         /// <summary>
         /// Calculates the Maintenance Energy Requirement (MER) results for a dog based on its life stage and weight.
         /// </summary>
@@ -70,7 +74,10 @@
                     LowerBounds = lowerMer,
                     UpperBounds = upperMer,
                     Rer = rer,
-                    Mean = mean
+                    Mean = mean,
+                    CupsLow = null,  // Initialized as null; set in component if kcalPerCup provided
+                    CupsHigh = null,
+                    CupsMean = null
                 };
             }
             catch (ArgumentOutOfRangeException ex)

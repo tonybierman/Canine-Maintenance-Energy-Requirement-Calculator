@@ -25,6 +25,13 @@
     </p>
 }
 
+<p>
+    <label>
+        Dog Food kcal per Cup (optional):
+        <input type="number" min="0" @bind="KcalPerCup" @bind:event="oninput" placeholder="e.g., 300" />
+    </label>
+</p>
+
 <div class="card text-white bg-secondary my-2 py-2 text-center">
     <div class="card-body">
         <ResultsDisplay Model="ResultsVM" />
@@ -37,6 +44,7 @@
 
 @code {
     private int inputValue = 45; // Default set to 45 lbs.
+    private double? kcalPerCup; // Optional kcal per cup, nullable to indicate not set
     private MerCalculatorResultsVM? ResultsVM { get; set; }
     private string? errorMessage;
     private int _selectedType = 2; // Default set to 2 (Adult)
@@ -61,6 +69,16 @@
         }
     }
 
+    private double? KcalPerCup
+    {
+        get => kcalPerCup;
+        set
+        {
+            kcalPerCup = value < 0 ? 0 : value; // Prevent negative kcal, allow 0 or null
+            UpdateResults();
+        }
+    }
+
     private readonly IEnumerable<LifeStageFactorsEnum> lifeStages = Enum.GetValues(typeof(LifeStageFactorsEnum))
         .Cast<LifeStageFactorsEnum>()
         .Where(f => f != LifeStageFactorsEnum.None)
@@ -79,7 +97,21 @@
             if (_selectedType > 0 && inputValue > 0)
             {
                 ResultsVM = MerCalculatorResultsVM.Calculate((LifeStageFactorsEnum)_selectedType, CanineMerCalculator.LbsToKg(inputValue));
-                errorMessage = null; // Clear any previous error
+                if (kcalPerCup.HasValue && kcalPerCup > 0)
+                {
+                    // Calculate cups to feed if kcal per cup is provided
+                    ResultsVM.CupsLow = ResultsVM.LowerBounds / kcalPerCup.Value;
+                    ResultsVM.CupsHigh = ResultsVM.UpperBounds / kcalPerCup.Value;
+                    ResultsVM.CupsMean = ResultsVM.Mean / kcalPerCup.Value;
+                }
+                else
+                {
+                    // Reset cups if no kcal per cup
+                    ResultsVM.CupsLow = null;
+                    ResultsVM.CupsHigh = null;
+                    ResultsVM.CupsMean = null;
+                }
+                errorMessage = null;
             }
             else
             {
@@ -101,7 +133,6 @@
         {
             ResultsVM = null;
             errorMessage = "An unexpected error occurred while calculating the results. Please try again.";
-            // Optional logging: Console.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }
