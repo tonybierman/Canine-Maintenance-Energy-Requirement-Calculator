@@ -25,13 +25,15 @@
     </p>
 }
 
-<p class="bg-light px-3">
-    <ResultsDisplay Model="ResultsVM" />
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <span class="text-danger">@errorMessage</span>
-    }
-</p>
+<div class="card text-white bg-secondary my-2 py-2 text-center">
+    <div class="card-body">
+        <ResultsDisplay Model="ResultsVM" />
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <span class="text-danger">@errorMessage</span>
+        }
+    </div>
+</div>
 
 @code {
     private int inputValue = 45; // Default set to 45 lbs.

@@ -2,28 +2,37 @@
 @if (Model != null)
 {
     <div class="results-container">
-        <h3>Calculation Results</h3>
-        <div class="result-item">
-            <span class="label">Resting Energy Requirement (RER):</span>
-            <span class="value">@Model.Rer.ToString("N2") kcal</span>
-        </div>
-        @if(Model.UpperBounds != Model.LowerBounds)
+        <p>A dog who weighs <strong>@Model.WeightInPounds.ToString("F2") lbs.</strong> with a status of <strong>@Model.LifeStage</strong> has an average <strong>MER </strong> of <strong>@Model.Mean.ToString("F2") kcal</strong> per day.</p>
+
+        <button class="btn btn-primary" @onclick="ToggleResults">Details</button>
+
+        @if (showResults)
         {
-            <div>Maintenance Energy Requirement (MER)</div>
-            <div class="result-item">
-                <span class="label ps-3">Lower Bounds:</span>
-                <span class="value">@Model.LowerBounds.ToString("N2") kcal</span>
-            </div>
-            <div class="result-item">
-                <span class="label ps-3">Upper Bounds:</span>
-                <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
-            </div>
-        }
-        else
-        {
-            <div class="result-item">
-                <span class="label">Maintenance Energy Requirement (MER):</span>
-                <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+            <div class="mt-3">
+                <h3>Detailed Calculation Results</h3>
+                <div class="result-item">
+                    <span class="label">Resting Energy Requirement (RER):</span>
+                    <span class="value">@Model.Rer.ToString("N2") kcal</span>
+                </div>
+                @if (Model.UpperBounds != Model.LowerBounds)
+                {
+                    <div>Maintenance Energy Requirement (MER)</div>
+                    <div class="result-item">
+                        <span class="label ps-3">Lower Bounds:</span>
+                        <span class="value">@Model.LowerBounds.ToString("N2") kcal</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label ps-3">Upper Bounds:</span>
+                        <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="result-item">
+                        <span class="label">Maintenance Energy Requirement (MER):</span>
+                        <span class="value">@Model.UpperBounds.ToString("N2") kcal</span>
+                    </div>
+                }
             </div>
         }
     </div>
@@ -32,4 +41,10 @@
 @code {
     [Parameter]
     public MerCalculatorResultsVM? Model { get; set; }
+    private bool showResults = false; // Default visibility state
+    // Toggle the visibility of the results div
+    private void ToggleResults()
+    {
+        showResults = !showResults;
+    }
 }
