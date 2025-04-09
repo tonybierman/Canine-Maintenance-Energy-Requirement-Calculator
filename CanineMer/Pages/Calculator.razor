@@ -1,12 +1,10 @@
 ﻿@using System.Linq
+@using MatBlazor
 
 <p>Input a dog's weight and lifestyle to see his or her maintenance energy requirement.</p>
 
 <p>
-    <label>
-        Dog's Weight in Pounds:
-        <input type="number" min="1" @bind="InputValue" @bind:event="oninput" />
-    </label>
+    <MatTextField @bind-Value="@InputValue" OnInput="OnWeightInput" Label="Dog's Weight in Pounds:"></MatTextField>
 </p>
 
 @if (InputValue > 0)
@@ -27,8 +25,9 @@
 
 <p>
     <label>
-        Dog Food kcal per Cup (optional):
-        <input type="number" min="0" @bind="KcalPerCup" @bind:event="oninput" placeholder="e.g., 300" />
+        
+        <MatTextField @bind-Value="@KcalPerCup" OnInput="OnDogFoodKCalInput" Label="Dog Food kcal/cup (optional):"></MatTextField>
+
     </label>
 </p>
 
@@ -44,10 +43,21 @@
 
 @code {
     private int inputValue = 45; // Default set to 45 lbs.
-    private double? kcalPerCup; // Optional kcal per cup, nullable to indicate not set
+    private double? kcalPerCup = 445; // Optional kcal per cup, nullable to indicate not set
     private MerCalculatorResultsVM? ResultsVM { get; set; }
     private string? errorMessage;
     private int _selectedType = 2; // Default set to 2 (Adult)
+
+
+    private void OnWeightInput(ChangeEventArgs args)
+    {
+        UpdateResults();
+    }
+
+    private void OnDogFoodKCalInput(ChangeEventArgs args)
+    {
+        UpdateResults();
+    }
 
     private int SelectedType
     {

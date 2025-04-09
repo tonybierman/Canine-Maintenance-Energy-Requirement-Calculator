@@ -1,0 +1,152 @@
+﻿@page "/dog-weight-loss-plan"
+
+<h3>Dog Weight Loss Plan Calculator</h3>
+
+<div class="form-group">
+    <label>Current Weight (lbs):</label>
+    <input type="number" step="0.1" class="form-control" @bind="currentWeight" placeholder="e.g., 87.6" />
+</div>
+
+<div class="form-group">
+    <label>Ideal Weight (lbs):</label>
+    <input type="number" step="0.1" class="form-control" @bind="idealWeight" placeholder="e.g., 55" />
+</div>
+
+<button class="btn btn-primary" @onclick="GeneratePlan">Generate Weight Loss Plan</button>
+
+@if (isPlanGenerated)
+{
+    <article class="mt-4">
+        <h4>Weight Loss Plan</h4>
+        <p>The dog has a current weight of @currentWeight pounds and an ideal weight of about @idealWeight pounds.</p>
+
+        <section>
+            <h5>Step 1: Understand RER and Weight Loss</h5>
+            <p>The RER represents the calories a dog needs at rest to maintain basic bodily functions (not accounting for activity). For weight loss, feeding 70–80% of the RER at the ideal body weight is a common approach in veterinary nutrition, as it provides enough energy to support metabolism while creating a calorie deficit to promote fat loss.</p>
+        </section>
+
+        <section>
+            <h5>Step 2: Calculate Feeding Range</h5>
+            <p>The RER at the ideal weight (@idealWeight lbs) is @Math.Round(rer) kcal/day. To determine the calorie intake for weight loss:</p>
+            <ul>
+                <li>70% of RER: @Math.Round(rer) × 0.7 = @Math.Round(rer70, 1) kcal/day</li>
+                <li>80% of RER: @Math.Round(rer) × 0.8 = @Math.Round(rer80, 1) kcal/day</li>
+            </ul>
+            <p>Thus, the dog should be fed between @Math.Round(rer70)–@Math.Round(rer80) kcal per day to promote safe weight loss.</p>
+        </section>
+
+        <section>
+            <h5>Step 3: Considerations for Weight Loss</h5>
+            <p><strong>Rate of Weight Loss:</strong> Dogs should lose weight gradually, typically at a rate of 1–2% of their body weight per week. For the current weight of @currentWeight lbs:</p>
+            <ul>
+                <li>1% of @currentWeight = @Math.Round(minWeeklyLoss, 3) lbs</li>
+                <li>2% of @currentWeight = @Math.Round(maxWeeklyLoss, 3) lbs</li>
+                <li>Weekly weight loss target: @Math.Round(minWeeklyLoss, 1)–@Math.Round(maxWeeklyLoss, 2) lbs</li>
+            </ul>
+            <p><strong>Monitoring:</strong> Weigh the dog every 1–2 weeks to ensure they’re losing weight at a safe rate. If the dog is losing too quickly (>2% per week), slightly increase their calories. If the dog isn’t losing weight, consider reducing calories further (e.g., closer to 70% of RER) or assessing other factors like treats or exercise.</p>
+            <p><strong>Diet Composition:</strong> Use a high-protein, low-fat, and low-calorie diet to maintain muscle mass and keep the dog satiated.</p>
+        </section>
+
+        <section>
+            <h5>Step 4: Realistic Adjustment</h5>
+            <p>Since the dog’s body weight will decrease weekly, the actual weight loss rate (in pounds) will slow as they approach their goal. A more practical approach is to use an average rate, say 1–1.5 lbs per week, which aligns with typical canine weight loss plans:</p>
+            <ul>
+                <li>At 1 lb/week: @Math.Round(weightToLose, 1) lbs ÷ 1 lb/week = @Math.Round(maxWeeks, 1) weeks (~@Math.Round(maxWeeks) weeks)</li>
+                <li>At 1.5 lb/week: @Math.Round(weightToLose, 1) lbs ÷ 1.5 lbs/week = @Math.Round(minWeeks, 2) weeks (~@Math.Round(minWeeks) weeks)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h5>Final Estimate</h5>
+            <p>Assuming a consistent calorie intake of @Math.Round(rer70)–@Math.Round(rer80) kcal/day (70–80% of their RER) and moderate exercise, the dog will likely take @Math.Round(minWeeks)–@Math.Round(maxWeeks) weeks (approximately @Math.Round(minMonths, 1)–@Math.Round(maxMonths, 1) months) to reach @idealWeight pounds, depending on how their body responds and whether the plan is adjusted over time.</p>
+        </section>
+
+        <section>
+            <h5>Factors That Could Affect This</h5>
+            <ul>
+                <li><strong>Metabolism:</strong> As the dog loses weight, their RER will decrease slightly, potentially slowing progress unless calories are adjusted.</li>
+                <li><strong>Exercise:</strong> More activity could speed up the process.</li>
+                <li><strong>Consistency:</strong> Treats, table scraps, or deviations from the plan could extend the timeline.</li>
+                <li><strong>Health:</strong> Underlying conditions (e.g., hormonal imbalances) could require vet intervention.</li>
+            </ul>
+        </section>
+    </article>
+}
+
+@code {
+    private double currentWeight;
+    private double idealWeight;
+    private bool isPlanGenerated;
+    private double rer;
+    private double rer70;
+    private double rer80;
+    private double weightToLose;
+    private double minWeeklyLoss;
+    private double maxWeeklyLoss;
+    private double minWeeks;
+    private double maxWeeks;
+    private double minMonths;
+    private double maxMonths;
+
+    private void GeneratePlan()
+    {
+        if (currentWeight <= 0 || idealWeight <= 0)
+        {
+            isPlanGenerated = false;
+            return;
+        }
+
+        // Convert weights to kg
+        double currentWeightKg = currentWeight * 0.453592;
+        double idealWeightKg = idealWeight * 0.453592;
+
+        // Calculate RER at ideal weight
+        rer = CalculateRer(idealWeightKg);
+        rer70 = rer * 0.7;
+        rer80 = rer * 0.8;
+
+        // Weight loss calculations
+        weightToLose = currentWeight - idealWeight;
+        minWeeklyLoss = currentWeight * 0.01; // 1%
+        maxWeeklyLoss = currentWeight * 0.02; // 2%
+        minWeeks = weightToLose / 1.5; // At 1.5 lbs/week
+        maxWeeks = weightToLose / 1.0; // At 1 lb/week
+        minMonths = minWeeks / 4.33;
+        maxMonths = maxWeeks / 4.33;
+
+        isPlanGenerated = true;
+    }
+
+    private static double CalculateRer(double bodyWeightKg)
+    {
+        if (bodyWeightKg <= 0)
+            throw new ArgumentOutOfRangeException(nameof(bodyWeightKg), "Body weight must be positive.");
+        return 70 * Math.Pow(bodyWeightKg, 0.75);
+    }
+}
+
+<style>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 200px;
+    }
+
+    article {
+        max-width: 800px;
+    }
+
+    section {
+        margin-bottom: 20px;
+    }
+
+    h5 {
+        margin-top: 15px;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+</style>
