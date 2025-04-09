@@ -3,10 +3,10 @@
 {
     <div class="results-container">
         <h2>@Model.Mean.ToString("F2") kcal/day
-        @if (Model.CupsMean.HasValue)
-        {
+            @if (Model.CupsMean.HasValue)
+            {
                 <text> = @Model.CupsMean.Value.ToString("F2") cups/day</text>
-        }
+            }
         </h2>
         <p>A dog who weighs <strong>@Model.WeightInPounds.ToString("F2") lbs.</strong> with a status of <strong>@Model.LifeStage</strong> has an average <strong>MER</strong> of <strong>@Model.Mean.ToString("F2") kcal</strong> per day.</p>
         @if (Model.CupsMean.HasValue)
@@ -44,6 +44,7 @@
                 }
             </div>
         }
+
     </div>
 }
 
